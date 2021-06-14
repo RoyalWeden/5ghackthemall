@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+        <title>Admin | Metso Outotec 1</title>
+
+        <script>
+            function check_email(input) {
+                if (input.value != document.getElementById('email1').value) {
+                    input.setCustomValidity('Email Must be Matching.');
+                } else {
+                    // input is valid -- reset the error message
+                    input.setCustomValidity('');
+                }
+            }
+
+            function check_password(input) {
+                if (input.value != document.getElementById('password1').value) {
+                    input.setCustomValidity('Password Must be Matching.');
+                } else {
+                    // input is valid -- reset the error message
+                    input.setCustomValidity('');
+                }
+            }
+        </script>
+    </head>
+    <body>
+        
+        {% if 'email' not in session %}
+
+        <div class="container-fluid mt-5">
+            <form class="row mt-5 g-3 justify-content-md-center text-center" method="POST">
+                <input type="text" name="signtype" value="signup" hidden>
+                <div class="col-2">
+                    <input type="email" name="email" class="form-control" id="email1" placeholder="Email" required>
+                </div>
+                <div class="col-2">
+                    <input type="email" name="confirmemail" class="form-control" id="email2" placeholder="Confirm Email" oninput="check_email(this)" required>
+                </div>
+                <div class="col-2">
+                    <input type="password" name="password" class="form-control" id="password1" placeholder="Password" required>
+                </div>
+                <div class="col-2">
+                    <input type="password" name="confirmpassword" class="form-control" id="password2" placeholder="Confirm Password" oninput="check_password(this)" required>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary mb-3">Sign Up</button>
+                </div>
+            </form>
+
+            <form class="row g-3 mt-5 justify-content-md-center text-center" method="POST">
+                <input type="text" name="signtype" value="signin" hidden>
+                <div class="col-3">
+                    <input type="email" name="email" class="form-control" id="email1" placeholder="Email" required>
+                </div>
+                <div class="col-3">
+                    <input type="password" name="password" class="form-control" id="password1" placeholder="Password" required>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary mb-3">Sign In</button>
+                </div>
+            </form>
+        </div>
+
+        {% else %}
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Home</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Add Document</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/edit-profile">Edit Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/signout">Sign Out</a>
+                    </li>
+                </ul>
+                </div>
+            </div>
+        </nav>
+
+        <form class="container-sm">
+            <h2 class="mb-3">Add a Document</h2>
+            <div class="mb-3">
+                <label for="document_type" class="form-label">Document Type</label>
+                <select class="form-select" name="document_type" name="document_type" required>
+                    <option selected value="5G Overview">5G Overview</option>
+                    <option value="Use Case">Use Case</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="document_title" class="form-label">Title</label>
+                <input type="text" name="document_title" class="form-control" id="document_title" placeholder="Title" required>
+            </div>
+            <div class="mb-3">
+                <label for="document_summary" class="form-label">Summary</label>
+                <textarea class="form-control" name="document_summary" id="document_summary" rows="2" placeholder="Summarize the topic of discussion..." required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="document_description" class="form-label">Full Description</label>
+                <textarea class="form-control" name="document_description" id="document_description" rows="12" placeholder="Discuss the full description of this topic..." required></textarea>
+            </div>
+            {% for i in range(1, 6) %}
+            <div class="mb-2">
+                <label for="document_relevantlink{{ i }}" class="form-label">Relevant Link #{{ i }} (Optional)</label>
+                <input type="text" name="document_relevantlink{{ i }}" class="form-control" id="document_relevantlink{{ i }}" placeholder="Relevant Link #{{ i }}">
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary mb-5">Submit</button>
+        </form>
+
+        {% endif %}
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+    </body>
+</html>
