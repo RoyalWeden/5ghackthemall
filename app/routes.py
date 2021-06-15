@@ -3,7 +3,7 @@ from flask import redirect, render_template, session, url_for, request
 from app.database import SQLConnection
 
 sqlconn = SQLConnection()
-sqlconn.execute_sql(sqlconn.drop_tables)
+# sqlconn.execute_sql(sqlconn.drop_tables)
 
 @app.route('/')
 def home():
