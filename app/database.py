@@ -25,7 +25,7 @@ class SQLConnection():
         self.cur.execute(
             """
             DROP TABLE IF EXISTS users;
-            DROP TABLE IF EXISTS use_cases;
+            DROP TABLE IF EXISTS documents;
             """
         )
 
@@ -42,14 +42,14 @@ class SQLConnection():
                 password text,
                 type boolean
             );
-            CREATE TABLE IF NOT EXISTS document (
-                use_case_id uuid NOT NULL UNIQUE,
-                document_type boolean NOT NULL,
+            CREATE TABLE IF NOT EXISTS documents (
+                document_id uuid NOT NULL UNIQUE,
+                editor uuid,
+                document_type varchar NOT NULL,
                 title varchar NOT NULL UNIQUE,
                 summary text NOT NULL,
                 full_description text NOT NULL,
-                relevant_links text[],
-                editors uuid[]
+                relevant_links text[5]
             );
             """
         )
@@ -94,6 +94,22 @@ class SQLConnection():
             return pass_type[2]
         return None
 
+    # def is_admin_user(self, user_id):
+    #     self.cur.execute(
+    #         """
+    #         SELECT email, type
+    #         FROM users
+    #         WHERE user_id = '{0}';
+    #         """.format(user_id)
+    #     )
+    #     email_type = self.cur.fetchone()
+
+    #     if email_type == None:
+    #         return None
+    #     if int(email_type[1]) == 1:
+    #         return email_type[0]
+    #     return None
+
     def get_user(self, user_id):
         self.cur.execute(
             """
@@ -134,3 +150,51 @@ class SQLConnection():
         link2 = str(profile[3] or '')
 
         return [profile[4], firstname, lastname, link1, link2]
+
+    def create_document(self, user_id, document_type, title, summary, full_description, link1, link2, link3, link4, link5):
+        document_id = str(uuid1())
+        self.cur.execute(
+            """
+            INSERT INTO documents (document_id, editor, document_type, title, summary, full_description, relevant_links)
+            VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{{"{6}", "{7}", "{8}", "{9}", "{10}"}}')
+            """.format(document_id, user_id, document_type, title, summary, full_description, link1, link2, link3, link4, link5)
+        )
+        return document_id
+
+    def get_document(self, document_id):
+        self.cur.execute(
+            """
+            SELECT *
+            FROM documents
+            WHERE document_id = '{0}';
+            """.format(document_id)
+        )
+        document = self.cur.fetchone()
+        if document == None:
+            return None
+
+        editor = self.get_user(document[1])
+
+        return {
+            'id': document[0],
+            'document_type': document[2],
+            'editor_name': (editor[1] + ' ' + editor[2]),
+            'title': document[3],
+            'summary': document[4],
+            'full_description': document[5],
+            'links': document[6]
+        }
+
+    def get_all_documents(self):
+        self.cur.execute(
+            """
+            SELECT document_id
+            FROM documents
+            """
+        )
+        documents_id = self.cur.fetchall()
+        documents = []
+        if documents_id != None and len(documents_id) > 0:
+            for document_id in documents_id[0]:
+                documents.append(self.get_document(document_id))
+        return documents
