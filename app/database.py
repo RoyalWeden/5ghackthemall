@@ -14,6 +14,7 @@ class SQLConnection():
     def execute_sql(self, func, *args):
         conn = connector.connect(self.pri, self.driver, user=self.user, password=self.password, db=self.db)
         self.cur = conn.cursor()
+        self.create_tables()
         result = func(*args)
         conn.commit()
         self.cur.close()
@@ -35,9 +36,7 @@ class SQLConnection():
                 user_id uuid NOT NULL UNIQUE,
                 firstname varchar,
                 lastname varchar,
-                link1name varchar,
                 link1 varchar,
-                link2name varchar,
                 link2 varchar,
                 email varchar,
                 password text,
@@ -56,7 +55,6 @@ class SQLConnection():
         )
 
     def create_user(self, user_id=None):
-        self.create_tables()
         if user_id == None:
             user_id = str(uuid1())
         self.cur.execute(
@@ -69,7 +67,6 @@ class SQLConnection():
         return user_id
 
     def set_admin_user(self, user_id, email, password):
-        self.create_tables()
         dk = hashlib.pbkdf2_hmac('sha256', bytes(password.encode()), b'salt', 100000, dklen=512)
         self.cur.execute(
             """
@@ -81,7 +78,6 @@ class SQLConnection():
         return email
 
     def is_admin_user(self, email, password):
-        self.create_tables()
         self.cur.execute(
             """
             SELECT password, type, user_id
@@ -99,7 +95,6 @@ class SQLConnection():
         return None
 
     def get_user(self, user_id):
-        self.create_tables()
         self.cur.execute(
             """
             SELECT *
@@ -113,3 +108,29 @@ class SQLConnection():
             return None
         else:
             return user
+
+    def edit_profile(self, user_id, firstname, lastname, link1='', link2=''):
+        self.cur.execute(
+            """
+            UPDATE users
+            SET firstname = '{0}', lastname = '{1}', link1 = '{2}', link2 = '{3}'
+            WHERE user_id = '{4}';
+            """.format(firstname, lastname, link1, link2, user_id)
+        )
+        return firstname, lastname
+
+    def get_profile(self, user_id):
+        self.cur.execute(
+            """
+            SELECT firstname, lastname, link1, link2, email
+            FROM users
+            WHERE user_id = '{0}';
+            """.format(user_id)
+        )
+        profile = self.cur.fetchone()
+        firstname = str(profile[0] or '')
+        lastname = str(profile[1] or '')
+        link1 = str(profile[2] or '')
+        link2 = str(profile[3] or '')
+
+        return [profile[4], firstname, lastname, link1, link2]

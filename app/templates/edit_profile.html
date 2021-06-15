@@ -52,19 +52,23 @@
             </div>
         </nav>
 
-        <form class="container-sm">
+        <form class="container-sm" method="POST">
             <h2 class="mb-3">Edit Profile</h2>
             <div class="mb-3">
+                <label for="profile_email" class="form-label">Email</label>
+                <input class="form-control" type="text" value="{{ user_profile[0] }}" id="profile_email" readonly>
+            </div>
+            <div class="mb-3">
                 <label for="profile_name" class="form-label">Name</label>
-                <input type="text" name="profile_firstname" class="form-control" id="profile_name" placeholder="First Name" required>
-                <input type="text" name="profile_lastname" class="form-control" id="profile_name" placeholder="Last Name" required>
+                <input type="text" name="profile_firstname" class="form-control mb-2" id="profile_name" placeholder="First Name" value="{{ user_profile[1] }}" required>
+                <input type="text" name="profile_lastname" class="form-control" id="profile_name" placeholder="Last Name" value="{{ user_profile[2] }}" required>
             </div>
-            {% for i in range(1, 4) %}
             <div class="mb-2">
-                <label for="personal_link{{ i }}" class="form-label">Link #{{ i }} (Optional)</label>
-                <input type="text" name="personal_link{{ i }}" class="form-control" id="personal_link{{ i }}" placeholder="Link #{{ i }}">
+                <input type="url" name="personal_link1" class="form-control" id="personal_link1" value="{{ user_profile[3] }}" placeholder="Link #1">
             </div>
-            {% endfor %}
+            <div class="mb-2">
+                <input type="url" name="personal_link2" class="form-control" id="personal_link2" value="{{ user_profile[4] }}" placeholder="Link #2">
+            </div>
             <button type="submit" class="btn btn-primary mb-5">Save Changes</button>
         </form>
 

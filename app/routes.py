@@ -45,6 +45,28 @@ def signout():
         session.pop('email', None)
     return redirect('/admin')
 
+@app.route('/admin/edit-profile', methods=['GET','POST'])
+def edit_profile():
+    create_session_user()
+    if 'email' not in session:
+        return redirect('/')
+
+    if request.method == 'POST':
+        name = sqlconn.execute_sql(
+            sqlconn.edit_profile,
+            session['user_id'],
+            request.form['profile_firstname'],
+            request.form['profile_lastname'],
+            request.form['personal_link1'],
+            request.form['personal_link2']
+        )
+        print("Profile Updated", name)
+        return redirect('/admin/edit-profile')
+
+    user_profile = sqlconn.execute_sql(sqlconn.get_profile, session['user_id'])
+
+    return render_template('edit_profile.html', user_profile=user_profile)
+
 def create_session_user():
     if 'user_id' not in session:
         session['user_id'] = sqlconn.execute_sql(sqlconn.create_user)
