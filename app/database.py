@@ -5,14 +5,20 @@ from uuid import uuid1
 
 class SQLConnection():
     def __init__(self):
-        self.conn = connector.connect(
-            config['DBPRI'],
-            config['DBDRIVER'],
-            user=config['DBUSER'],
-            password=config['DBPASSWORD'],
-            db=config['DBNAME']
-        )
-        self.cur = self.conn.cursor()
+        self.pri = config['DBPRI']
+        self.driver = config['DBDRIVER']
+        self.user = config['DBUSER']
+        self.password = config['DBPASSWORD']
+        self.db = config['DBNAME']
+
+    def execute_sql(self, func, *args):
+        conn = connector.connect(self.pri, self.driver, user=self.user, password=self.password, db=self.db)
+        self.cur = conn.cursor()
+        result = func(*args)
+        conn.commit()
+        self.cur.close()
+        conn.close()
+        return result
 
     def drop_tables(self):
         self.cur.execute(

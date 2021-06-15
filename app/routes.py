@@ -3,7 +3,7 @@ from flask import redirect, render_template, session, url_for, request
 from app.database import SQLConnection
 
 sqlconn = SQLConnection()
-sqlconn.drop_tables()
+sqlconn.execute_sql(sqlconn.drop_tables)
 
 @app.route('/')
 def home():
@@ -24,10 +24,10 @@ def admin():
 
         if request.method == 'POST':
             if request.form['signtype'] == 'signup':
-                email = sqlconn.set_admin_user(session['user_id'], request.form['email'], request.form['password'])
+                email = sqlconn.execute_sql(sqlconn.set_admin_user, session['user_id'], request.form['email'], request.form['password'])
                 print("Signed Up:", email)
             elif request.form['signtype'] == 'signin':
-                user_id = sqlconn.is_admin_user(request.form['email'], request.form['password'])
+                user_id = sqlconn.execute_sql(sqlconn.is_admin_user, request.form['email'], request.form['password'])
                 if user_id != None:
                     session['user_id'] = user_id
                     session['email'] = request.form['email']
@@ -47,10 +47,10 @@ def signout():
 
 def create_session_user():
     if 'user_id' not in session:
-        session['user_id'] = sqlconn.create_user()
+        session['user_id'] = sqlconn.execute_sql(sqlconn.create_user)
     else:
-        if sqlconn.get_user(session['user_id']) == None:
-            sqlconn.create_user(session['user_id'])
+        if sqlconn.execute_sql(sqlconn.get_user, session['user_id']) == None:
+            sqlconn.execute_sql(sqlconn.create_user, session['user_id'])
     print('User ID:', session['user_id'])
 
 
